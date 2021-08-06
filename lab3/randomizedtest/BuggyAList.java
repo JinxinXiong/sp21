@@ -28,6 +28,10 @@ public class BuggyAList<Item> {
     private void resize(int capacity) {
         Item[] a = (Item[]) new Object[capacity];
         for (int i = 0; i < size; i += 1) {
+            /** Added boundary condition **/
+            if (items[i] == null) {
+                break;
+            }
             a[i] = items[i];
         }
         items = a;
@@ -60,8 +64,11 @@ public class BuggyAList<Item> {
       * returns deleted item. */
     public Item removeLast() {
         if ((size < items.length / 4) && (size > 4)) {
-            resize(size / 4);
+//            resize(size / 4);
+            /** Changed the capacity to the quater of the original items length**/
+            resize(items.length / 4);
         }
+
         Item x = getLast();
         items[size - 1] = null;
         size = size - 1;
