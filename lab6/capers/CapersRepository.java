@@ -1,10 +1,12 @@
 package capers;
 
 import java.io.File;
+import java.io.IOException;
+
 import static capers.Utils.*;
 
 /** A repository for Capers 
- * @author TODO
+ * @author Jinxin
  * The structure of a Capers Repository is as follows:
  *
  * .capers/ -- top level folder for all persistent data in your lab12 folder
@@ -18,9 +20,10 @@ public class CapersRepository {
     static final File CWD = new File(System.getProperty("user.dir"));
 
     /** Main metadata folder. */
-    static final File CAPERS_FOLDER = null; // TODO Hint: look at the `join`
-                                            //      function in Utils
-
+    static final File CAPERS_FOLDER = Utils.join(CWD, ".capers"); // TODO Hint: look at the `join`
+                                                                            //      function in Utils
+    static final String story_path = ".capers/story.txt";
+    static final String dog_path = ".capers/dogs";
     /**
      * Does required filesystem operations to allow for persistence.
      * (creates any necessary folders or files)
@@ -32,6 +35,17 @@ public class CapersRepository {
      */
     public static void setupPersistence() {
         // TODO
+        if (! CAPERS_FOLDER.exists()) {
+            CAPERS_FOLDER.mkdir();
+            File story = new File(story_path);
+            try {
+                story.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            File dogs = new File(dog_path);
+            dogs.mkdir();
+        }
     }
 
     /**
@@ -41,6 +55,22 @@ public class CapersRepository {
      */
     public static void writeStory(String text) {
         // TODO
+        File story = new File(story_path);
+        if (! story.exists()) {
+            try {
+                story.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        // get the previous content
+        String contents;
+        File inFile = new File(story_path);
+        contents = Utils.readContentsAsString(inFile);
+        String newline = contents + text + '\n';
+        System.out.println(newline);
+
+        Utils.writeContents(story, newline);
     }
 
     /**
@@ -50,6 +80,9 @@ public class CapersRepository {
      */
     public static void makeDog(String name, String breed, int age) {
         // TODO
+        Dog dog = new Dog(name, breed, age);
+        dog.saveDog();
+        System.out.println(dog.toString());
     }
 
     /**
@@ -60,5 +93,15 @@ public class CapersRepository {
      */
     public static void celebrateBirthday(String name) {
         // TODO
+        File file_by_name = Utils.join(dog_path, name);
+        if (! file_by_name.exists()) {
+            System.out.println("No such a dog exits, please check the dog's name!");
+            return;
+        }
+
+        Dog dog = Utils.readObject(file_by_name, Dog.class);
+        dog.haveBirthday();
+
+        Utils.writeObject(file_by_name, dog);
     }
 }
